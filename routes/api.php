@@ -16,7 +16,6 @@ use App\Rating;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -125,10 +124,7 @@ Route::post('rating',function(Request $request){
     }
     return json_encode($response);
 });
-function transpose($array) {
-    array_unshift($array, null);
-    return call_user_func_array('array_map', $array);
-}
+
 Route::post('comment',function(Request $request){
     $anime = Anime::find($request->anime_id);
     $userId = $request->user_id;
@@ -168,6 +164,11 @@ Route::get('animeDetail/{animeid}',function($anime_id){
     return json_encode($response);
 
 });
+function transpose($array) {
+    array_unshift($array, null);
+    return call_user_func_array('array_map', $array);
+}
+
 function randomData($x,$y){
     $all=[];
     for($i=0;$i<$x;$i++){
@@ -278,7 +279,7 @@ function findSut($user,$itemAcakC,$similarUser,$F){
     $total=0;
     $tetangga = findTetangga($user,$similarUser);
     for($i=0;$i<count($tetangga);$i++){
-        $nilai=in_array($itemAcakC,findP($tetangga[$i],$F))?1:0;
+        $nilai=in_array($itemAcakC,findP($tetangga[$i],$F)) ? 1:0;
         $total += $similarUser[$user][$tetangga[$i]]*$nilai;
     }
     return $total;      
@@ -308,21 +309,6 @@ function findRuj($d,$u,$W,$Vt,$B,$itemAcakL){
     return $total+$B[$itemAcakL];
 }
 
-Route::get('anime/rekomendasi/{limit?}/{query?}',function($limit=5,$query=""){
-    $limit==null?5:$limit;
-    $limit=$limit==null?5:$limit;
-    $anime = DB::select("select s.id,s.title,s.members,s.img_url,s.type,s.episode,s.genre, rm.value, ROUND(avg(r.rating),2) as rating
-        from animes s left join
-             ratings r
-             on s.id = r.anime_id left join recommendations rm on rm.anime_id = s.id 
-        where s.title like '%".$query."%'
-        group by s.id, s.title,s.members,s.img_url,s.type,s.episode,s.genre,rm.value
-        order by rm.value desc limit $limit");
-    $response = new stdClass;
-    $response->error = 0;
-    $response->data = $anime;
-    return json_encode($response);
-});
 
 Route::get('prosesanime',function(){
     DB::table('recommendations')->truncate();
@@ -532,25 +518,103 @@ Route::get('prosesanime',function(){
     // echo "</pre>";
     return json_encode($response);
 });
-Route::get('anime/{ordermethod}/{limit?}/{query?}', function($order,$limit=null,$query=""){
+
+Route::get('anime/rekomendasi/{limit?}/{query?}',function($limit=5,$query=""){
+    $limit==null?5:$limit;
     $limit=$limit==null?5:$limit;
-    $anime = DB::select("select s.id,s.title,s.members,s.img_url,s.type,s.episode,s.genre, ROUND(avg(r.rating),2) as rating
-        from animes s left join
-             ratings r
-             on s.id = r.anime_id
+    $anime = DB::select("select s.id,s.title,s.members,s.img_url,s.type,s.episode,s.genre, rm.value, ROUND(avg(r.rating),2) as rating
+        from animes s 
+        left join ratings r on s.id = r.anime_id 
+        left join recommendations rm on rm.anime_id = s.id 
         where s.title like '%".$query."%'
-        group by s.id, s.title,s.members,s.img_url,s.type,s.episode,s.genre
-        order by ".$order." desc limit $limit");
+        group by s.id, s.title,s.members,s.img_url,s.type,s.episode,s.genre,rm.value
+        order by rm.value desc limit $limit");
     $response = new stdClass;
-    // foreach($anime as $a){
-    //     $data = DB::table('ratings')->where('anime_id',$a->id)->avg('rating');
-    //     $a->rating = round($data);
-    // }
-    // usort($anime, function($a, $b)
-    // {
-    //     return strcmp($a->rating, $b->rating);
-    // });
     $response->error = 0;
     $response->data = $anime;
     return json_encode($response);
+});
+
+Route::get('mae', function()
+{
+    // $F=[];
+    // $animes=[];
+    $users = User::orderBy('id','asc')->get();
+    // $rerata_rating = [];
+    // foreach($users as $u){
+    //     $animes = Anime::orderBy('id','asc')->get();
+    //     $temp=[];
+    //     $nItem = count($animes);
+    //     $rata = 0;
+    //     foreach($animes as $a){
+    //         $rating = Rating::where(['user_id'=>$u->id,'anime_id'=>$a->id])->get();
+    //         $temp[] = count($rating)==0 ? 0 : $rating[0]->rating;
+    //         if(count($rating) > 0){
+    //             $total = (Rating::where(['user_id'=>$u->id,'anime_id'=>$a->id])->sum('rating'));
+    //             $rerata_rating[] = ['anime_id'=>$a->id, 'user_id'=>$u->id, 'total_rating'=>$total, 'banyak_rating'=>count($rating)];
+    //         } else {
+    //             $rerata_rating[] = ['anime_id'=>$a->id, 'user_id'=>$u->id, 'total_rating'=>0, 'banyak_rating'=>0];
+    //         } 
+    //     }
+    //     $F[]=$temp;
+    // }
+
+    // $rekomendasi = [];
+
+    
+
+    // $real_mae = [];
+    // foreach($rerata_rating as &$item){
+    //     $search = array_search($item['anime_id'], array_column($animes, 'anime_id'));
+    //     if($item['total_rating'] != 0){
+    //         $real_mae[] = [
+    //             "mae"=>(float)abs( ((float)$item['total_rating']/$item['banyak_rating']) - $animes[$search]->value ) / $item['banyak_rating'],
+    //             "user_id" => $item['user_id']
+    //         ];
+    //     } 
+    // }
+    // dd($real_mae);
+
+    $animes = DB::table('recommendations')->get();
+    $animes = $animes->toArray();
+    $rating = DB::table('ratings')->get();
+    
+    $total = [];
+    foreach($users as $user){
+        $eam = [];
+        foreach($rating as $item){
+            if($item->user_id == $user->id){ //if found
+                $search = array_search($item->anime_id, array_column($animes, 'anime_id')); // ex : 1
+                $jumlahData = DB::table('ratings')->where('user_id',$user->id)->count(); //ex : 1
+                $eam[] = [
+                    'mae' => (float)abs($item->rating - $animes[$search]->value) / $jumlahData,
+                    'user_id' => $user->id,
+                    'anime_id' => $animes[$search]->anime_id
+                ];
+            }
+        }
+        if(count($eam)>0){
+            $total[] = $eam;
+        }
+    }
+    
+    $hasil = [];
+    foreach($total as $item){
+        $counter = 0;
+        foreach($item as $x){
+            $counter += $x['mae'];
+        }
+        $hasil[] = [
+            'user_id' => $item[0]['user_id'],
+            'rata_error' => (float)$counter/count($item)
+        ];
+    }
+    // dd($total,$hasil);
+    $response = new stdClass;
+    $response->total = $total;
+    $response->hasil = $hasil; 
+    $response->message = "Berhasil diproses";
+
+    return json_encode($response);
+
 });

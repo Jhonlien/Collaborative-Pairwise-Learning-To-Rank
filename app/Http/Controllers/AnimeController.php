@@ -65,28 +65,30 @@ class AnimeController extends Controller
         }
     
     public function more(Request $request){
-        if($request->is('/anime/more/tv'))
+        if($request->is('anime/more/tv'))
         {
             $anime = DB::table('animes')->where('type','tv')->paginate(12);
             return view('user.more', compact('anime'));
         }
-        else if($request->is('/anime/more/movie'))
+        else if($request->is('anime/more/movie'))
         {
             $anime = DB::table('animes')->where('type','movie')->paginate(12);
             return view('user.more', compact('anime'));
         }
-        else if($request->is('/anime/more/ova'))
+        else if($request->is('anime/more/ova'))
         {
             $anime = DB::table('animes')->where('type','ova')->paginate(12);
             return view('user.more', compact('anime'));
         }
-        else if($request->is('/anime/more/asc'))
+        else if($request->is('anime/more/asc'))
         {
             $anime = DB::table('animes')->orderBy('title','asc')->paginate(12);
             return view('user.more', compact('anime'));
         }
-        $anime = DB::table('animes')->orderBy('title','desc')->paginate(12);
-        return view('user.more', compact('anime'));
+        else if($request->is('anime/more/desc')){
+            $anime = DB::table('animes')->orderBy('title','desc')->paginate(12);
+            return view('user.more', compact('anime'));
+        }
     }
 
     public function test(){

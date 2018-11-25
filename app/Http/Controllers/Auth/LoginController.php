@@ -46,7 +46,7 @@ class LoginController extends Controller
 
 
     public function logout(){
-        Alert::success('Success Logout','Thanks for using application','top-center');
+        Alert::toast('Success Logout','Thanks you!','top-center');
         Auth::guard('web')->logout();
         return redirect('/');
     }

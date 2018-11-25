@@ -140,15 +140,15 @@ form .stars span {
       <form id="ratingsForm" class="left-align" action="{{ route('anime.rating',$detail) }}" method="POST">
         {{csrf_field()}}
           <div class="stars">
-              <input type="radio" name="rating" class="star-1" id="star-1" value="1" />
+              <input type="radio" name="rating" class="star-1" id="star-1" value="1" required />
               <label class="star-1" for="star-1">1</label>
-              <input type="radio" name="rating" class="star-2" id="star-2" value="2" />
+              <input type="radio" name="rating" class="star-2" id="star-2" value="2" required/>
               <label class="star-2" for="star-2">2</label>
-              <input type="radio" name="rating" class="star-3" id="star-3" value="3" />
+              <input type="radio" name="rating" class="star-3" id="star-3" value="3" required/>
               <label class="star-3" for="star-3">3</label>
-              <input type="radio" name="rating" class="star-4" id="star-4" value="4" />
+              <input type="radio" name="rating" class="star-4" id="star-4" value="4" required/>
               <label class="star-4" for="star-4">4</label>
-              <input type="radio" name="rating" class="star-5" id="star-5" value="5" />
+              <input type="radio" name="rating" class="star-5" id="star-5" value="5" required/>
               <label class="star-5" for="star-5">5</label>
               <span></span>
           </div>
@@ -184,7 +184,8 @@ form .stars span {
       <form class="col s6" method="POST" action="{{route('anime.comment',$detail->id)}}" id="form" style="border:1px solid #ccc; width: 500px; padding: 10px;">
         {{ csrf_field() }}
         <div class="input-field col s12" style="width:450px;">
-          <textarea id="textarea2" name="comment" class="materialize-textarea" data-length="120" id="comment"></textarea>
+          <textarea id="textarea2" name="comment" class="materialize-textarea" data-length="120" id="comment" required>
+          </textarea>
           <label for="textarea2">Comment</label>
         </div>
         <div class="left-align">

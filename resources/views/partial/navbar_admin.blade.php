@@ -97,13 +97,13 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="./index.html">
+            <a class="nav-link" href="{{url('administrator/data/comment')}}">
               <i class="fas fa-comments text-orange"></i>Comments
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="./index.html">
-              <i class="fas fa-tv text-purple"></i>Recommendation
+            <a class="nav-link" href="{{url('administrator/data/recommendation')}}">
+              <i class="fas fa-tv text-purple"></i>Update Recommendation
             </a>
           </li>
         </ul>

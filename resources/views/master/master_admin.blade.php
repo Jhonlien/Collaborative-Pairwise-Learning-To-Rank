@@ -11,6 +11,8 @@
   <link href="{{ asset('admin/vendor/@fortawesome/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
   <link href="{{ asset('admin/css/argon.css?v=1.0.0') }}" type="text/css" rel="stylesheet">
   <script src="https://unpkg.com/sweetalert2@7.18.0/dist/sweetalert2.all.js"></script>
+  <link rel="stylesheet" href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.min.css">
+
 </head>
 <body>
   @include('sweetalert::alert')
@@ -24,6 +26,8 @@
   <script src="{{ asset('admin/vendor/chart.js/dist/Chart.min.js') }}"></script>
   <script src="{{ asset('admin/vendor/chart.js/dist/Chart.extension.js') }}"></script>
   <script src="{{ asset('admin/js/argon.js?v=1.0.0') }}"></script>
+  <script src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
+
   @yield('script')
 </body>
 </html>

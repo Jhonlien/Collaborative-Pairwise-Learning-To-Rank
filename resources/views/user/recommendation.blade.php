@@ -14,7 +14,6 @@
 		        <div class="card-content">
 		        <h6>{{str_limit($animes['title'],$limit = 20, $end ='...')}}</h6>
 		        <h6 class="teal-text"> <i class="material-icons left teal-text">tv</i>{{$animes['type']}}</h6><h6 class="teal-text"><i class="material-icons left teal-text">confirmation_number</i>{{$animes['members']}}</h6>
-
 		        </div>
 		        <div class="card-action">
 		          <div class="right-align">

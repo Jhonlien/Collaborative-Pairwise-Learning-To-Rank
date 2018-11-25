@@ -30,11 +30,23 @@
             </div>
           </div>
 		</div>
-	</div>
-	<center>
+		<div class="col-xl-12 mb-6  mt--15" style="margin-top:40px;">
+			<div class="card shadow" style="padding: 10px;">
+	            <div class="card-header border-0">
+	            	<div class="row align-items-center">
+	                <div class="">
+	                  <h4 style="">Anime Rating Tertinggi</h4>
+	                </div>
+	              </div>
+	            </div>
+
+	        <center>
             	<div id="piechart" style="width:900px; height: 400px">
   				</div>
             </center>
+	        </div>
+    	</div>
+	</div>
 	</div>
 
 	<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -63,9 +75,13 @@
 				 </div>
 			</div>
 			<div class="row" style="padding: 10px;">
-			     <div class="col-md-12">
+			     <div class="col-md-8">
 				      <div class="form-group">
-				        <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Type">
+				        <select>
+ 										<option value="TV">TV</option>
+										<option value="MOVIE">MOVIE</option>
+										<option value="OVA">OVA</option> 
+								</select>
 				      </div>
 				 </div>
 			</div>
@@ -176,7 +192,7 @@
           curveType: 'function',
           legend: { position: 'top' }
         };
-        var chart = new google.visualization.LineChart(document.getElementById('piechart'));
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
         chart.draw(data, options);
       }
 </script>

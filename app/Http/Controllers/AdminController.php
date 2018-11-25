@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use RealRashid\SweetAlert\Facades\Alert;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Client;
 use Auth;
 use DB;
+use DataTables;
 use App\User;
 use App\Anime;
 class AdminController extends Controller
@@ -114,7 +117,7 @@ class AdminController extends Controller
             foreach($posts as $r){
                 $data1['username'] = $r->username;
                 $data1['email'] = $r->email;
-                $data1['created_at'] = date('d-m-Y H:i:s',strtotime($r->created_at));
+                $data1['created_at'] = date('d-m-Y',strtotime($r->created_at));
                 $data1['action'] = 
             '<a href="users/edit/'.$r->id.'" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
                                 
@@ -171,8 +174,8 @@ class AdminController extends Controller
         }
         else{
             $bulan = "Desember";
-        } 
-        $res[] = [$bulan, $value->total, $value->month];
+        }
+        $res[] = [$bulan, $value->total,$value->month];
     }
     $js = json_encode($res);
     return view('admin.user',compact('js'));
@@ -285,7 +288,9 @@ class AdminController extends Controller
         $anime_rating_chart = DB::select('select a.title as title, round(avg(r.rating),2) as rating from animes a
                                         right join ratings r 
                                         on a.id = r.anime_id
-                                        group by a.id, a.title,a.members,a.img_url,a.type,a.episode,a.genre');
+                                        group by a.id, a.title,a.members,a.img_url,a.type,a.episode,a.genre
+                                        order by rating desc
+                                        limit 3');
         $anime = "Animes";
         $chart[] = ['title','rating'];
         foreach ($anime_rating_chart as $key => $value) {
@@ -293,5 +298,121 @@ class AdminController extends Controller
         }
         $response = json_encode($chart);
         return view('admin.animes',compact('response'));
+    }
+
+    public function updateRecommendation(){
+            $client = new Client();
+            $response = $client->get('http://localhost/maanime/public/api/anime/prosesanime')->getBody()->getContents();
+            dd($response);       
+    }
+
+    public function mae(){
+        $users = User::orderBy('id','asc')->get();
+        // $rerata_rating = [];
+        // foreach($users as $u){
+        //     $animes = Anime::orderBy('id','asc')->get();
+        //     $temp=[];
+        //     $nItem = count($animes);
+        //     $rata = 0;
+        //     foreach($animes as $a){
+        //         $rating = Rating::where(['user_id'=>$u->id,'anime_id'=>$a->id])->get();
+        //         $temp[] = count($rating)==0 ? 0 : $rating[0]->rating;
+        //         if(count($rating) > 0){
+        //             $total = (Rating::where(['user_id'=>$u->id,'anime_id'=>$a->id])->sum('rating'));
+        //             $rerata_rating[] = ['anime_id'=>$a->id, 'user_id'=>$u->id, 'total_rating'=>$total, 'banyak_rating'=>count($rating)];
+        //         } else {
+        //             $rerata_rating[] = ['anime_id'=>$a->id, 'user_id'=>$u->id, 'total_rating'=>0, 'banyak_rating'=>0];
+        //         } 
+        //     }
+        //     $F[]=$temp;
+        // }
+
+        // $rekomendasi = [];
+
+        $animes = DB::table('recommendations')->get();
+        $animes = $animes->toArray();
+
+        // $real_mae = [];
+        // foreach($rerata_rating as &$item){
+        //     $search = array_search($item['anime_id'], array_column($animes, 'anime_id'));
+        //     if($item['total_rating'] != 0){
+        //         $real_mae[] = [
+        //             "mae"=>(float)abs( ((float)$item['total_rating']/$item['banyak_rating']) - $animes[$search]->value ) / $item['banyak_rating'],
+        //             "user_id" => $item['user_id']
+        //         ];
+        //     } 
+        // }
+        // dd($real_mae);
+
+
+        $rating = DB::table('ratings')->get();
+        
+        $total = [];
+        foreach($users as $user){
+            $eam = [];
+            foreach($rating as $item){
+                if($item->user_id == $user->id){
+                    $search = array_search($item->anime_id, array_column($animes, 'anime_id'));
+                    $jumlahData = DB::table('ratings')->where('user_id',$user->id)->count();
+                    $eam[] = [
+                        'mae' => (float)abs($item->rating - $animes[$search]->value) / $jumlahData,
+                        'user_id' => $user->id,
+                        'anime_id' => $animes[$search]->anime_id
+                    ];
+
+                }
+            }
+            if(count($eam)>0){
+                $total[] = $eam;
+            }
+        }
+        
+        $hasil = [];
+        foreach($total as $item){
+            $counter = 0;
+            foreach($item as $x){
+                $counter += $x['mae'];
+            }
+            $hasil[] = [
+                'user_id' => $item[0]['user_id'],
+                'rata_error' => (float)$counter/count($item)
+            ];
+        }
+
+        dd($total,$hasil);
+    }
+
+    public function getCommentsJson(){
+        $komentar = DB::table('comments')->join('users','comments.user_id','=','users.id')
+                                         ->join('animes','comments.anime_id','=','animes.id')
+                                         ->select('comments.id','users.username','animes.title','comment');
+        return DataTables::of($komentar)->addColumn('action',function($comments){
+            return '<a href="datakomentar/delete/'.$comments->id.'" onclick="return confirm()" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>';
+        })->make(true);
+    }
+
+    public function getComments(){
+        return view('admin.comments');
+    }
+
+    public function getRecommendationJson(){
+        $anime = DB::select("select s.id,s.title,s.members,s.type,s.episode,s.genre, rm.value, ROUND(avg(r.rating),2) as rating
+        from animes s 
+        left join ratings r on s.id = r.anime_id 
+        left join recommendations rm on rm.anime_id = s.id 
+        group by s.id, s.title,s.members,s.type,s.episode,s.genre,rm.value
+        order by value DESC");
+
+        return DataTables::of($anime)->make();
+    }
+
+    public function getRecommendation(){
+        return view('admin.recommendation');
+    }
+
+    public function recommendation(){
+        $client = new Client();
+        $response = $client->get('http://localhost/maanime/public/api/prosesanime');
+        return redirect()->back();
     }
 }
