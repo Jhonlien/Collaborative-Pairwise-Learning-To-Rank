@@ -106,9 +106,18 @@
               <i class="fas fa-tv text-purple"></i>Update Recommendation
             </a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{url('administrator/data/mae')}}">
+              <i class="fas fa-tv text-orange"></i>Pengujian MAE
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{{url('administrator/data/proses')}}">
+              <i class="fas fa-tv text-green"></i>Proses CPLR
+            </a>
+          </li>
         </ul>
-        <!-- Divider -->
-        <!-- Heading -->
       </div>
     </div>
   </nav>

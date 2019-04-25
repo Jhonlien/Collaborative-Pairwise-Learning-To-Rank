@@ -215,15 +215,9 @@
                     <td>
                       {{$animes->genre}}
                     </td>
-                    @if(count($animes->rating) == null)
-                      <td>
-                      -
-                      </td>
-                    @else
                       <td>
                         {{$animes->rating}}
                       </td>
-                    @endif
                     <td>
                       {{$animes->fav}}
                     </td>
@@ -235,6 +229,71 @@
           </div>
         </div>
       </div>
-
+       <div class="row mt-5" style="margin-bottom: 50px;">
+        <div class="col-xl-12 mb-5 mb-xl-0">
+          <div class="card shadow">
+            <div class="card-header border-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h3 class="mb-0">User Uploads ({{$count_anime}})</h3>
+                </div>
+                
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table align-items-center table-flush">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">ID</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Episode</th>
+                    <th scope="col">Members</th>
+                    <th scope="col">Genre</th>
+                    <th scope="col">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                <?php
+                  $nom = 0;
+                ?>
+                @foreach($user_uploads as $key=>$animes)
+                  <tr>
+                    <th scope="row">
+                      <?php
+                      $nom++;
+                      ?>
+                      {{$nom}}
+                    </th>
+                    <td>
+                      {{$animes->id}}
+                    </td>
+                    <td>
+                      {{$animes->title}}
+                    </td>
+                    <td>
+                      {{$animes->type}}
+                    </td>
+                    <td>
+                      {{$animes->episode}}
+                    </td>
+                    <td>
+                      {{$animes->members}}
+                    </td>
+                    <td>
+                      {{$animes->genre}}
+                    </td>
+                    <td>
+                      <a href="{{route('delete.animes',$animes->id)}}" class="btn-sm btn-warning" onclick="return confirm()"><i class="fas fa-trash-alt"></i></a>
+                    </td>
+                  </tr>
+                 @endforeach 
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 @endsection

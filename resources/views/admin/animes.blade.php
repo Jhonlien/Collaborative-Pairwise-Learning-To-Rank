@@ -59,25 +59,26 @@
         </button>
       </div>
       <div class="modal-body">
-      	<form>
+      	<form method="POST" action="{{route('add.animes')}}">
+				{{csrf_field()}}
       		 <div class="row" style="padding: 10px;">
 			     <div class="col-md-12">
 				      <div class="form-group">
-				        <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Title">
+				        <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Title" name="title">
 				      </div>
 				 </div>
 			</div>
 			<div class="row" style="padding: 10px;">
 			     <div class="col-md-12">
 				      <div class="form-group">
-				        <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Image URL">
+				        <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Image URL" name="img_url">
 				      </div>
 				 </div>
 			</div>
 			<div class="row" style="padding: 10px;">
 			     <div class="col-md-8">
 				      <div class="form-group">
-				        <select>
+				        <select name="type">
  										<option value="TV">TV</option>
 										<option value="MOVIE">MOVIE</option>
 										<option value="OVA">OVA</option> 
@@ -88,16 +89,31 @@
 			<div class="row" style="padding: 10px;">
 			     <div class="col-md-12">
 				      <div class="form-group">
-				        <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Genre">
+				        <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Episode" name="episode">
 				      </div>
 				 </div>
 			</div>
-      	</form>
+			<div class="row" style="padding: 10px;">
+			     <div class="col-md-12">
+				      <div class="form-group">
+				        <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Members" name="members">
+				      </div>
+				 </div>
+			</div>
+			<div class="row" style="padding: 10px;">
+			     <div class="col-md-12">
+				      <div class="form-group">
+				        <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Genre" name="genre">
+				      </div>
+				 </div>
+			</div>
+      	
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-success">Save changes</button>
+        <button type="submit" class="btn btn-success">Save</button>
       </div>
+			</form>
     </div>
   </div>
 </div>

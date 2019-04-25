@@ -18,12 +18,13 @@
           </li>
         @else
          <li>
-            <a href="{{route('list.favorit',Auth::user()->username)}}" class="white-text text-lighten-1 btn pink darken-2 hoverable">
+            <a href="{{route('list.favorit',Auth::user()->username)}}" class="white-text text-lighten-1 btn pink darken-2" style="border-radius:100px;">
               <i class="material-icons right">favorite</i>List Favorite</a>
           </li>
           <li>
-            <a href="{{route('anime.recommendation')}}" class="white-text text-lighten-1 btn teal white-text darken-1 hoverable">
-              Rekomendasi</a>
+            <a href="{{route('anime.recommendation')}}" class="white-text text-lighten-1 btn teal white-text darken-1" style="border-radius:30px;">
+              <i class="material-icons right">featured_play_list
+</i> Rekomendasi </a>
           </li>
           <li>
             <a href="#" class="dropdown-trigger modal-trigger teal-text text-lighten-1 btn white z-depth-0" data-target="dropdown2">

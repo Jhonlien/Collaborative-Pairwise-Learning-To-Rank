@@ -10,7 +10,11 @@
 			<div class="col s3">
 		      <div class="card medium hoverable" style="height: 500px;">
 		        <div class="card-image">
-		          <img src="{{URL::asset($animes->img_url)}}">
+		        @if($animes->img_url == 'null')
+		        	<img src="{{ asset('image/'.$animes->gambar.'') }}">
+		        @else
+		        	<img src="{{URL::asset($animes->img_url)}}">
+		        @endif	
 		        </div>
 		        <span class="card-title"></span>
 		        <div class="card-content">

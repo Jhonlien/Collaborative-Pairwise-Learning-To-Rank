@@ -164,6 +164,30 @@ Route::get('animeDetail/{animeid}',function($anime_id){
     return json_encode($response);
 
 });
+
+Route::post('add/anime',function(Request $request){
+    $response = new stdClass;
+    $response->error = 0;
+    $response->message='';
+    $post = Anime::create([
+                    'title'     => $request->title,
+                    'img_url'   => $request->img_url,
+                    'type'      => $request->type,
+                    'episode'   => $request->episode,
+                    'members'   => $request->members,
+                    'genre'     => $request->genre,
+                    'publish'   => $request->publish
+    ]);
+    if($post){
+        $response->message='Berhasil tambah anime';
+    }
+    else{
+        $response->error = 1;
+        $response->message = 'Gagal Menambahkan Anime';
+    }
+    return json_encode($response);    
+});
+
 function transpose($array) {
     array_unshift($array, null);
     return call_user_func_array('array_map', $array);
@@ -174,7 +198,7 @@ function randomData($x,$y){
     for($i=0;$i<$x;$i++){
         $temp = [];
         for($j=0;$j<$y;$j++){
-            $temp[] = rand(0, 10) / 10;; 
+            $temp[] = rand(0, 10) / 10;
         }
         $all[] = $temp;
     }   
@@ -243,14 +267,14 @@ function findP($id,$F){
 }
 function findC($id,$F,$similarUser){
     // global $F;
-    $tetangga = findTetangga($id,$similarUser);
-    $tempA = findP($tetangga[0],$F);
-    $tempB = findP($tetangga[1],$F);
-    $temp = findP($id,$F);
-    $result = array_diff($tempA,$temp);
-    $temp=array_merge($temp,$result);
-    $result2 = array_diff($tempB,$temp);
-    $result=array_merge($result,$result2);
+    $tetangga   = findTetangga($id, $similarUser);
+    $tempA      = findP($tetangga[0],$F);
+    $tempB      = findP($tetangga[1],$F);
+    $temp       = findP($id,$F);
+    $result     = array_diff($tempA, $temp);
+    $temp       = array_merge($temp,$result);
+    $result2    = array_diff($tempB,$temp);
+    $result     = array_merge($result,$result2);
     return $result;
 }
 function findL($id,$F,$nItem,$similarUser){
@@ -268,9 +292,7 @@ function findSui($user,$itemAcakP,$similarUser,$F){
     $total=0;
     $tetangga = findTetangga($user,$similarUser);
     for($i=0;$i<count($tetangga);$i++){
-        $nilai=in_array($itemAcakP,findP($tetangga[$i],$F))?1:0;
-        // echo $nilai."<br>";
-        // echo $similarUser[$user][$tetangga[$i]];
+        $nilai=in_array($itemAcakP,findP($tetangga[$i],$F)) ?  1 : 0;
         $total += $similarUser[$user][$tetangga[$i]]*$nilai;
     }
     return $total;  
@@ -279,13 +301,13 @@ function findSut($user,$itemAcakC,$similarUser,$F){
     $total=0;
     $tetangga = findTetangga($user,$similarUser);
     for($i=0;$i<count($tetangga);$i++){
-        $nilai=in_array($itemAcakC,findP($tetangga[$i],$F)) ? 1:0;
-        $total += $similarUser[$user][$tetangga[$i]]*$nilai;
+        $nilai=in_array($itemAcakC,findP($tetangga[$i],$F)) ? 1 : 0;
+        $total += $similarUser[$user][$tetangga[$i]] * $nilai;
     }
     return $total;      
 }
 function findCuit($Sui,$Sut){
-    return (1+$Sui)/(1+$Sut);
+    return ( 1 + $Sui )/( 1 + $Sut);
 }
 function findRui($d,$u,$W,$Vt,$B,$itemAcakP){
     $total=0;
@@ -294,6 +316,7 @@ function findRui($d,$u,$W,$Vt,$B,$itemAcakP){
     }
     return $total+$B[$itemAcakP];
 }
+
 function findRut($d,$u,$W,$Vt,$B,$itemAcakC){
     $total=0;
     for($i=0;$i<$d;$i++){
@@ -312,33 +335,34 @@ function findRuj($d,$u,$W,$Vt,$B,$itemAcakL){
 
 Route::get('prosesanime',function(){
     DB::table('recommendations')->truncate();
-    $F=[];
-    $animes=[];
-    $users = User::orderBy('id','asc')->get();
+    $F      = [];
+    $animes = [];
+    $users  = User::orderBy('id','asc')->get();
     foreach($users as $u){
         $animes = Anime::orderBy('id','asc')->get();
-        $temp=[];
-        $nItem = count($animes);
+        $temp   =[];
+        $nItem  = count($animes);
         foreach($animes as $a){
             $rating = Rating::where(['user_id'=>$u->id,'anime_id'=>$a->id])->get();
-            $temp[] = count($rating)==0?0:$rating[0]->rating;
+            $temp[] = count($rating) == 0 ? 0 : $rating[0]->rating;
         }
         $F[]=$temp;
     }
-    $nUser=count($users);
-    $k=2;
-    $T=3;
-    $d=2;
-    $alpha = 1;
-    $B=1;
-    $Y = 1;
+    $nUser  = count($users);
+    $k      = 2;
+    $T      = 3;
+    $d      = 2;
+    $alpha  = 1;
+    $B      = 1;
+    $Y      = 1;
     $lambda = 0.01;
-    $n=0.1;
-    $W = [];
-    $W = randomData($nUser,$d);
-    $V = randomData($d,$nItem);
-    $B = randomVektor($nItem);
-    $Vt=transpose($V);
+    $n      = 0.1;
+    $W      = [];    
+    $W      = randomData($nUser,$d);
+    $V      = randomData($d,$nItem);
+    $B      = randomVektor($nItem);
+    $Vt     = transpose($V);
+    
     $nSimilarUser=[];
     for($i=0;$i<$nUser;$i++){
         $temp=[];
@@ -357,9 +381,9 @@ Route::get('prosesanime',function(){
     for($j=0;$j<$T;$j++){
         $userAcak = rand(0,$nUser-1);
         // echo $userAcak;
-        $itemAcakP1=findP($userAcak,$F);
-        $itemAcakC1=findC($userAcak,$F,$similarUser);
-        $itemAcakL1=findL($userAcak,$F,$nItem,$similarUser);
+        $itemAcakP1 = findP($userAcak,$F);
+        $itemAcakC1 = findC($userAcak,$F,$similarUser);
+        $itemAcakL1 = findL($userAcak,$F,$nItem,$similarUser);
         // echo "<pre>";
         // print_r($itemAcakP1);
         // print_r($itemAcakC1);
@@ -371,6 +395,7 @@ Route::get('prosesanime',function(){
         }else{
             continue;
         }
+
         $itemAcakP = $itemAcakP1[rand(0,count($itemAcakP1)-1)];
         $itemAcakC = $itemAcakC1[rand(0,count($itemAcakC1)-1)];
         $itemAcakL = $itemAcakL1[rand(0,count($itemAcakL1)-1)];
@@ -378,14 +403,19 @@ Route::get('prosesanime',function(){
         // print_r());
         // print_r(findC($userAcak[$i]));
         // print_r(findL($userAcak[$i]));
+
         $Sui = findSui($userAcak,$itemAcakP,$similarUser,$F);
         $Sut = findSut($userAcak,$itemAcakC,$similarUser,$F);
+
+
         $Cuit = findCuit($Sui,$Sut);
-        $Cutj = 1+$Sut;
+        $Cutj = 1 + $Sut;
         $Cuij = 1 + $Sui;
-        $Rui =findRui($d,$userAcak,$W,$Vt,$B,$itemAcakP);
-        $Rut=findRut($d,$userAcak,$W,$Vt,$B,$itemAcakC);
-        $Ruj=findRuj($d,$userAcak,$W,$Vt,$B,$itemAcakL);
+
+        $Rui = findRui($d,$userAcak,$W,$Vt,$B,$itemAcakP);
+        $Rut = findRut($d,$userAcak,$W,$Vt,$B,$itemAcakC);
+        $Ruj = findRuj($d,$userAcak,$W,$Vt,$B,$itemAcakL);
+
         $Ruit = $Cuit*($Rui-$Rut);
         $Rutj = $Cutj*($Rut-$Ruj);
         $Ruij = $Cuij*($Rui-$Ruj);
@@ -393,10 +423,10 @@ Route::get('prosesanime',function(){
         // echo $Sut."<br>";
         // echo $Cuit." ".$Cutj." ".$Cuij." ".$Rui." ".$Rut." ".$Ruj;
         // echo "<br>".$Ruit." ".$Rutj." ".$Ruij;
-        // Perolehan nilai gradien untuk Matriks
+        // Perolehan nilai gradien untuk Matriks W
         $W1=[];
         for($i=0;$i<$d;$i++){
-            $W1[] = (((1*$Cuit)/(1+pow(exp(1),$Ruit)))*($Vt[$itemAcakP][$i]-$Vt[$itemAcakC][$i])) + (((1*$Cutj)/(1+pow(exp(1),$Rutj)))*($Vt[$itemAcakC][$i]-$Vt[$itemAcakL][$i])) + (((1*$Cuij)/(1+pow(exp(1),$Ruij)))*($Vt[$itemAcakP][$i]-$Vt[$itemAcakL][$i])) - ($lambda*$W[$userAcak][$i]);
+            $W1[] = (((1*$Cuit)/(1 + pow(exp(1),$Ruit))) * ($Vt[$itemAcakP][$i]-$Vt[$itemAcakC][$i])) + (((1*$Cutj)/(1+pow(exp(1),$Rutj)))*($Vt[$itemAcakC][$i]-$Vt[$itemAcakL][$i])) + (((1*$Cuij)/(1+pow(exp(1),$Ruij)))*($Vt[$itemAcakP][$i]-$Vt[$itemAcakL][$i])) - ($lambda * $W[$userAcak][$i]);
         }
         // print_r($W1);
         // Perolehan nilai gradien untuk matriks  untuk V.
@@ -415,9 +445,9 @@ Route::get('prosesanime',function(){
         // print_r($V1);
         // print_r($V2);
         // print_r($V3);
-        $B1=[];
-        $B2=[];
-        $B3=[];
+        $B1     = [];
+        $B2     = [];
+        $B3     = [];
         $B1[] = ((1*$Cuit)/(1+pow(exp(1),$Ruit)))  + ((1*$Cuij)/(1+pow(exp(1),$Ruij))) - ($lambda*$B[$itemAcakP]);
         $B2[] = ((1*$Cuit)/(1+pow(exp(1),$Ruit)))*(-1)  + ((1*$Cutj)/(1+pow(exp(1),$Rutj))) - ($lambda*$B[$itemAcakP]);
         $B3[] = ((1*$Cutj)/(1+pow(exp(1),$Rutj)))*(-1)  + ((1*$Cuij)/(1+pow(exp(1),$Ruij)))*(-1) - ($lambda*$B[$itemAcakP]);
@@ -431,9 +461,9 @@ Route::get('prosesanime',function(){
             $WBaru[] = $W[$userAcak][$i] + ($n*$W1[$i]);
         }
         // print_r($WBaru);
-        $VBaru = [];
-        $V2Baru=[];
-        $V3Baru = [];
+        $VBaru    = [];
+        $V2Baru   =[];
+        $V3Baru   = [];
         for($i=0;$i<$d;$i++){
             $VBaru[] = $Vt[$itemAcakP][$i]+($n*$V1[$i]);
         }
@@ -447,9 +477,9 @@ Route::get('prosesanime',function(){
         // print_r($V2Baru);
         // print_r($V3Baru);
         //pembaharuan nilai b
-        $B1Baru=[];
-        $B2Baru=[];
-        $B3Baru=[];
+        $B1Baru   =[];
+        $B2Baru   =[];
+        $B3Baru   =[];
         $B1Baru[] = $B[$itemAcakP] + ($n*$B1[0]);
         $B2Baru[] = $B[$itemAcakC] + ($n*$B2[0]);
         $B3Baru[] = $B[$itemAcakL] + ($n*$B3[0]);
@@ -458,7 +488,7 @@ Route::get('prosesanime',function(){
         // print_r($B3Baru);
 
         for($i=0;$i<$d;$i++){
-            $W[$userAcak][$i] = $WBaru[$i];
+            $W[$userAcak][$i]   = $WBaru[$i];
             $Vt[$itemAcakP][$i] = $VBaru[$i];
             $Vt[$itemAcakC][$i] = $V2Baru[$i];
             $Vt[$itemAcakL][$i] = $V3Baru[$i];
@@ -472,20 +502,25 @@ Route::get('prosesanime',function(){
         // print_r($B);
         // exit();
     }
+    
     $hasil=[];
     $total=1;
-    for($x=0;$x<$nUser;$x++){
-        for($y=0;$y<$nItem;$y++){
-            $hasil[$x][$y]= ($W[$x][0]*$Vt[$y][0])+($W[$x][1]*$Vt[$y][1])+$B[$y];
+    for($x=0;$x<$nUser;$x++)
+    {
+
+        for($y=0;$y<$nItem;$y++)
+        {
+            $hasil[$x][$y] = ($W[$x][0] * $Vt[$y][0]) + ($W[$x][1] * $Vt[$y][1]) + $B[$y];
         }
+
     }
     // echo "<br>Hasil<br><pre>";
     // print_r(transpose($hasil));
     // echo "</pre>";
-    $hasil=transpose($hasil);
-    $maxHasil =[];
+    $hasil      = transpose($hasil);
+    $maxHasil   = [];
+
     for($i=0;$i<count($hasil);$i++){
-    //     echo $i.") ".max($hasil[$i])."<br>";
         $maxHasil[] = max($hasil[$i]);
     }
     // echo "<pre>";
@@ -539,7 +574,7 @@ Route::get('mae', function()
 {
     // $F=[];
     // $animes=[];
-    $users = User::orderBy('id','asc')->get();
+    
     // $rerata_rating = [];
     // foreach($users as $u){
     //     $animes = Anime::orderBy('id','asc')->get();
@@ -574,7 +609,7 @@ Route::get('mae', function()
     //     } 
     // }
     // dd($real_mae);
-
+    $users = User::orderBy('id','asc')->get();
     $animes = DB::table('recommendations')->get();
     $animes = $animes->toArray();
     $rating = DB::table('ratings')->get();
@@ -601,18 +636,25 @@ Route::get('mae', function()
     $hasil = [];
     foreach($total as $item){
         $counter = 0;
-        foreach($item as $x){
-            $counter += $x['mae'];
+        foreach($item as $mae){
+            $counter += $mae['mae'];
         }
         $hasil[] = [
             'user_id' => $item[0]['user_id'],
             'rata_error' => (float)$counter/count($item)
         ];
     }
+
+    $pen = 0;
+    foreach($hasil as $done){
+        $pen += $done['rata_error'];
+    }
+    $has = $pen/count($hasil);
     // dd($total,$hasil);
     $response = new stdClass;
     $response->total = $total;
     $response->hasil = $hasil; 
+    $response->has = $has; 
     $response->message = "Berhasil diproses";
 
     return json_encode($response);

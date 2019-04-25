@@ -51,7 +51,12 @@ class AdminController extends Controller
         $user = $this->user_registered();
         $comment = $this->commented_anime();
         $anime = $this->anime();
-    	return view('admin.index', compact('count_user','count_anime','count_comment','user','comment','anime'));
+        $user_uploads = $this->user_uploads();
+    	return view('admin.index', compact('count_user','count_anime','count_comment','user','comment','anime','user_uploads'));
+    }
+
+    public function user_uploads(){
+        return $users = DB::select("SELECT * FROM animes WHERE user_id != 0");
     }
 
     public function user_registered(){
@@ -208,6 +213,42 @@ class AdminController extends Controller
         return redirect()->back();
     }
 
+    public function editAnimes($id){
+        $anime = Anime::find($id);
+        return view('admin.edit_animes',compact('anime'));
+    }
+
+    public function deleteAnimes($id){
+        $anime = Anime::find($id);
+        $anime->favorite()->delete();
+        $anime->comments()->delete();
+        $anime->ratings()->delete();
+        if($anime->delete()){
+            Alert::toast('Delete Success','success','top');
+            return redirect()->back();
+        }
+        else{
+            Alert::toast('Opps! Something Wrong..','warning','top');
+            return redirect()->back();
+        }
+    }
+    
+    public function addAnimes(Request $request){
+        $anime = new Anime();
+        $anime->title = $request->title;
+        $anime->img_url = $request->img_url;
+        $anime->type = $request->type;
+        $anime->episode = $request->episode;
+        $anime->members = $request->members;
+        $anime->genre = $request->genre;
+        if($anime->save()){
+            Alert::toast('Added Animes','success','top');
+            return redirect()->back();
+        }
+        Alert::toast('Opps! Something Wrong..','warning','top');
+        return redirect()->back();
+    }
+
     /* Animes CRUD */
 
     public function getAnimes(Request $request){
@@ -275,7 +316,7 @@ class AdminController extends Controller
                 $animes1['members'] = $value->members;
                 $animes1['genre'] = $value->genre;
                 $animes1['action'] = 
-'<a href="animes/edit/'.$value->id.'" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>                
+'               
 <a href="animes/delete/'.$value->id.'" onclick="return confirm()" class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i></a>';
 
                 $data[] = $animes1;
@@ -303,48 +344,14 @@ class AdminController extends Controller
     public function updateRecommendation(){
             $client = new Client();
             $response = $client->get('http://localhost/maanime/public/api/anime/prosesanime')->getBody()->getContents();
-            dd($response);       
+            return $response;       
     }
 
     public function mae(){
+        //$users = User::orderBy('id','asc')->get();
         $users = User::orderBy('id','asc')->get();
-        // $rerata_rating = [];
-        // foreach($users as $u){
-        //     $animes = Anime::orderBy('id','asc')->get();
-        //     $temp=[];
-        //     $nItem = count($animes);
-        //     $rata = 0;
-        //     foreach($animes as $a){
-        //         $rating = Rating::where(['user_id'=>$u->id,'anime_id'=>$a->id])->get();
-        //         $temp[] = count($rating)==0 ? 0 : $rating[0]->rating;
-        //         if(count($rating) > 0){
-        //             $total = (Rating::where(['user_id'=>$u->id,'anime_id'=>$a->id])->sum('rating'));
-        //             $rerata_rating[] = ['anime_id'=>$a->id, 'user_id'=>$u->id, 'total_rating'=>$total, 'banyak_rating'=>count($rating)];
-        //         } else {
-        //             $rerata_rating[] = ['anime_id'=>$a->id, 'user_id'=>$u->id, 'total_rating'=>0, 'banyak_rating'=>0];
-        //         } 
-        //     }
-        //     $F[]=$temp;
-        // }
-
-        // $rekomendasi = [];
-
         $animes = DB::table('recommendations')->get();
         $animes = $animes->toArray();
-
-        // $real_mae = [];
-        // foreach($rerata_rating as &$item){
-        //     $search = array_search($item['anime_id'], array_column($animes, 'anime_id'));
-        //     if($item['total_rating'] != 0){
-        //         $real_mae[] = [
-        //             "mae"=>(float)abs( ((float)$item['total_rating']/$item['banyak_rating']) - $animes[$search]->value ) / $item['banyak_rating'],
-        //             "user_id" => $item['user_id']
-        //         ];
-        //     } 
-        // }
-        // dd($real_mae);
-
-
         $rating = DB::table('ratings')->get();
         
         $total = [];
@@ -374,12 +381,18 @@ class AdminController extends Controller
                 $counter += $x['mae'];
             }
             $hasil[] = [
-                'user_id' => $item[0]['user_id'],
+                'user_id' => $item[1]['user_id'],
                 'rata_error' => (float)$counter/count($item)
             ];
         }
 
-        dd($total,$hasil);
+        
+        $pen = 0;
+        foreach($hasil as $done){
+            $pen += $done['rata_error'];
+        }
+        $has = $pen/count($hasil);
+        return view('admin.mae',compact('hasil','total','has'));
     }
 
     public function getCommentsJson(){
@@ -412,7 +425,9 @@ class AdminController extends Controller
 
     public function recommendation(){
         $client = new Client();
-        $response = $client->get('http://localhost/maanime/public/api/prosesanime');
+        $response = $client->get('http://localhost/maanimeV2/public/api/prosesanime');
         return redirect()->back();
     }
+
+
 }

@@ -89,9 +89,18 @@ form .stars span {
   </div>
   <div class="row">
   	<div class="container">
-  		<div class="col s12 z-depth-1 nav-wrapper" style="border-radius: 10px;">
+  		<div class="col s12 nav-wrapper" style="border: 1px solid #ecf0f1; padding: 15px; ">
   		<div class="col s8 ">
-  			<h5>{{$detail->title}}</h5>
+  			<h5>{{$detail->title}}</h5> 
+        @if($created === null)
+          <h6 class="teal-text" style="font-size: 14px;"> <i class="tiny material-icons">person</i> 
+          Created By : Admin
+          </h6>
+        @else
+          <h6 class="teal-text" style="font-size: 14px;"> <i class="tiny material-icons">person</i> 
+          Created By : {{ ucwords($created) }}
+          </h6> 
+        @endif
   			<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</p>
   			<b> Genre : </b> <span class="chip teal white-text">{{$detail->genre}}</span>
         <b>Type : </b> <span class="chip">{{$detail->type}} </span><br><br>
@@ -119,7 +128,11 @@ form .stars span {
   		</div>
   		<div class="col s4">
   			<div class="right-align margin-top margin-bott">
-  			<img src="{{URL::asset($detail->img_url)}}" width="300" id="myImg">
+  			 @if($detail->img_url == 'null')
+              <img src="{{ asset('image/'.$detail->gambar.'') }}">
+          @else
+              <img src="{{URL::asset($detail->img_url)}}">
+          @endif  
   			</div>
   		</div>
   		</div>
@@ -181,15 +194,15 @@ form .stars span {
   </div>
   <div class="col s6">
       <h5> Give your Comment &nbsp;<i class="material-icons">edit</i></h5>
-      <form class="col s6" method="POST" action="{{route('anime.comment',$detail->id)}}" id="form" style="border:1px solid #ccc; width: 500px; padding: 10px;">
+      <form class="col s6" method="POST" action="{{route('anime.comment',$detail->id)}}" id="form" style="border:1px solid #ecf0f1; width: 440px; padding: 10px;">
         {{ csrf_field() }}
-        <div class="input-field col s12" style="width:450px;">
-          <textarea id="textarea2" name="comment" class="materialize-textarea" data-length="120" id="comment" required>
+        <div class="input-field col s7" style="width:420px;">
+          <textarea id="textarea2" name="comment" class="materialize-textarea" data-length="" id="comment" required>
           </textarea>
           <label for="textarea2">Comment</label>
         </div>
         <div class="left-align">
-            <button class="btn" type="submit" id="send-comment"> send <i class="material-icons right">message</i></button>
+            <button class="btn" type="submit" id="send-comment"> Comment <i class="material-icons right">message</i></button>
         </div>
       </form>
   </div>

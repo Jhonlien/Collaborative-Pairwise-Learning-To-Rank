@@ -6,8 +6,12 @@
       <form action="{{ route('anime.search') }}" method="post">
         {{csrf_field()}}
         <div class="input-field teal-text text-lighten-1 hoverable">
-          <input id="search" type="search" id="autocomplete-input" class="autocomplete teal-text" placeholder="Search Here" name="keyword" required>
-          <i class="material-icons teal-text">search</i>
+          <input id="search" type="search" id="autocomplete-input" class="autocomplete teal-text" placeholder="Search Anime" name="keyword" required>
+          <div class="right-align">
+          <button type="submit" class="btn-large" style="float:right; margin-top:-67px;margin-right:5px;">
+            <i class="material-icons center white-text" style="margin-top: -5px;">search</i>
+          </button>
+        </div>
         </div>
       </form>
     </div>
@@ -22,7 +26,7 @@
 </div>
 <ul id='dropdown1' class='dropdown-content'>
   <li>
-    <a href="{{url('/anime/more/movie')}}"">Movie</a>
+    <a href="{{url('/anime/more/movie')}}"">MOVIE</a>
   </li>
   <li>
     <a href="{{url('/anime/more/tv')}}">TV</a>
@@ -31,10 +35,16 @@
     <a href="{{url('/anime/more/ova')}}"">OVA</a>
   </li>
   <li>
-    <a href="{{url('/anime/more/asc')}}">ASC Title</a>
+    <a href="{{url('/anime/more/asc')}}">ASC</a>
   </li>
   <li>
-    <a href="{{url('/anime/more/desc')}}">DESC Title</a>
+    <a href="{{url('/anime/more/desc')}}">DESC</a>
+  </li>
+  <li>
+    <a href="{{url('/anime/more/rating')}}">RATING</a>
+  </li>
+    <li>
+    <a href="{{url('anime/more/members')}}">MEMBERS</a>
   </li>
 </ul>
 <script type="text/javascript">

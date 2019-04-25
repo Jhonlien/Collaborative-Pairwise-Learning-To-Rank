@@ -10,7 +10,7 @@
             <div class="card-header border-0">
               <div class="row align-items-center">
                 <div class="">
-                  <h4 style="">Data Komentar</h4>
+                  <h4 style="">Data Rekomendasi</h4>
                 </div>
               </div>
             </div>

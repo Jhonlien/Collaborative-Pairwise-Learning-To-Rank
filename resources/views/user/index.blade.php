@@ -36,7 +36,7 @@
 <div class="container">
   <div class="row">
       <div class="center-align">
-        <a href="{{url('anime/more/')}}" class="btn-large waves-effect waves-white teal darken-2 text-center hoverable"> More Anime <i class="material-icons right">more_horiz</i></a>
+        <a href="{{url('anime/more/ova')}}" class="btn-large waves-effect waves-white teal darken-2 text-center hoverable"> More Anime <i class="material-icons right">more_horiz</i></a>
       </div>
   </div>
 </div>

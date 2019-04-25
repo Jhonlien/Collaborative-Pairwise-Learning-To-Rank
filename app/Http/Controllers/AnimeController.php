@@ -44,7 +44,15 @@ class AnimeController extends Controller
         $count_comment = DB::table('comments')->where('anime_id',$id)->count();
         $count_favorit = DB::table('favorites')->where('anime_id',$id)->count();
         $rating = $this->rating($id);
-        return view('user.detail', compact('comment','detail','count_comment','count_favorit','rating'));
+        $created = $this->user_created1($id);
+        return view('user.detail', compact('comment','detail','count_comment','count_favorit','rating','created'));
+    }
+
+    private function user_created1($id){
+        $creat = DB::table('animes')->leftJoin('users', 'animes.user_id','=','users.id')
+                                    ->select('animes.id','users.username')
+                                    ->where('animes.id',$id)->first()->username;
+        return $creat;
     }
 
     private function rating($id){
@@ -60,7 +68,7 @@ class AnimeController extends Controller
             $query->where('title', 'like', "%{$request->keyword}%")
                     ->orWhere('genre', 'like', "%{$request->keyword}%")
                     ->orWhere('type', 'like', "%{$request->keyword}%");
-            })->paginate(12);
+            })->paginate(50);
         return view('user.search', compact('search','query'));
         }
     
@@ -89,10 +97,17 @@ class AnimeController extends Controller
             $anime = DB::table('animes')->orderBy('title','desc')->paginate(12);
             return view('user.more', compact('anime'));
         }
-    }
-
-    public function test(){
-        $comment = Comment::where('anime_id',$id)->count();
-        dd($comment);
+        else if($request->is('anime/more/rating')){
+            $anime = DB::select("select s.id,s.title,s.members,s.img_url,s.type,s.episode,s.genre, ROUND(avg(r.rating),2) as rating
+                from animes s 
+                left join ratings r on s.id = r.anime_id 
+                group by s.id, s.title,s.members,s.img_url,s.type,s.episode,s.genre
+                order by rating desc");
+            return view('user.rating', compact('anime'));
+        }
+        else if($request->is('anime/more/members')){
+            $anime = DB::table('animes')->orderBy('members','desc')->paginate(12);
+            return view('user.more', compact('anime'));
+        }
     }
 }

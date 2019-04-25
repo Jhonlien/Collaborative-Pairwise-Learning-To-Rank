@@ -26,12 +26,7 @@ class UserController extends Controller
 
     public function editUser(){
     	$user = Auth::user();
-        $comment = DB::table('comments')->join('animes','comments.anime_id','=','animes.id')
-                                        ->join('users','comments.user_id','=','users.id')
-                                        ->select('comments.id','animes.title','comment')
-                                        ->where('user_id', $user)
-                                        ->get();
-    	return view('user.edit', compact('user', 'comment'));
+    	return view('user.edit', compact('user'));
     }
 
     public function SaveEditUser(Request $request){
@@ -118,11 +113,92 @@ class UserController extends Controller
         return view('user.favorite',compact('favorite'));
     }
 
+    public function manage(){
+        $id = auth()->id();
+        $fav        = DB::select("select f.id as fav_id, a.id as anime_id, a.title FROM favorites f 
+                                LEFT JOIN animes a ON f.anime_id = a.id 
+                                LEFT JOIN users u ON f.user_id = u.id 
+                                WHERE f.user_id = $id");
+
+        $animes     = DB::select("SELECT animes.title, animes.id FROM animes 
+                                    INNER JOIN users ON animes.user_id = users.id                    
+                                    WHERE animes.user_id = $id");
+
+        $comment    = DB::select("SELECT comments.id as id, comments.comment, animes.title, animes.id as anime_id FROM `comments`
+                                    INNER JOIN users ON comments.user_id = users.id
+                                    INNER JOIN animes ON comments.anime_id = animes.id
+                                    WHERE comments.user_id = $id");
+
+        return view('user.manage', compact('fav', 'animes', 'comment'));
+        //dd($comment);
+    }
+ 
+
     public function recommendation(){
         $client = new Client();
-        $response = $client->get('http://localhost/maanime/public/api/anime/rekomendasi/12')->getBody()->getContents();
+        $click = $client->get('http://localhost/maanimeV2/public/api/prosesanime');
+        $response = $client->get('http://localhost/maanimeV2/public/api/anime/rekomendasi/100')->getBody()->getContents();
         $data = json_decode($response, true);           
         return view('user.recommendation',compact('data'));
     }
 
+    public function addAnime(Request $request){
+            $anime = new Anime;
+            $anime->title = $request->title;
+            $anime->img_url = $request->img_url;
+            $anime->type = $request->type;
+            $anime->episode = $request->episode;
+            $anime->members = $request->members;
+            $anime->genre = $request->genre;
+            $file = $request->file('gambar');
+            $fileName   = $file->getClientOriginalName();
+            $request->file('gambar')->move("image/", $fileName);
+            $anime->gambar = $fileName;
+            $anime->user_id = auth()->id();
+            if($anime->save()){
+                Alert::success('Anime Adding to list','success','top');
+                return redirect()->back();
+            }
+            else{
+                Alert::error('Opps','Error Adding Anime to Database');
+            }
+        }
+    public function deleteCommentUser($id){
+        $comment = Comment::find($id);
+        if($comment->delete()){
+             Alert::success('Comment Delete!', 'Success Delete Your Comment');
+             return redirect()->back();
+        }
+        else{
+             Alert::error('Error Title', 'Error');
+             return redirect()->back();
+        }
+        
+    }
+    public function deleteFavoritUser($id){
+        $fav = Favorite::find($id);
+        if($fav->delete()){
+             Alert::success('Favorite Delete!', 'Success Delete Your Favorite');
+             return redirect()->back();
+        }
+        else{
+             Alert::error('Error Title', 'Error');
+             return redirect()->back();
+        }
+        
+    }
+    public function deleteAnimeUser($id){
+        $anime = Anime::find($id);
+        $anime->favorite()->delete();
+        $anime->comments()->delete();
+        $anime->ratings()->delete();
+        if($anime->delete()){
+             Alert::success('Anime Delete!', 'Success Delete Your Anime');
+             return redirect()->back();
+        }
+        else{
+             Alert::error('Error Title', 'Error');
+             return redirect()->back();
+        }
+    }
 }

@@ -50,11 +50,6 @@
         </form>
       </div>
     </div>
-    <div class="col s6">
-      <div class="z-depth-1 white lighten-5" id="register-box" style="display: inline-block; padding: 0px 60px 0px 60px; width:450px; ;border: 1px solid #EEE;">
-          
-      </div>
-  </div>
-  </div>
+</div>
 </div>
 @endsection
